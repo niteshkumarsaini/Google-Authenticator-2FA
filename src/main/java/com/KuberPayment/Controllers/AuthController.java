@@ -75,12 +75,9 @@ public class AuthController {
      */
     @GetMapping("/handle-2fa")
     public String handleLoginWith2FA(HttpSession session) {
-    	System.out.println("This is login auth ");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication);
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            System.out.println("Auth Error");
             return "redirect:/login?error=auth";
         }
 
@@ -88,7 +85,6 @@ public class AuthController {
         Optional<AppUser> optionalUser = userRepo.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
-            System.out.println("User not found");
             return "redirect:/login?error=userNotFound";
         }
 
@@ -96,7 +92,6 @@ public class AuthController {
 
         if (user.is2FAEnabled()) {
             session.setAttribute("user", user);
-            System.out.println("User Auth done qr here");
             return "redirect:/otp";
         }
 
@@ -108,9 +103,7 @@ public class AuthController {
 
     @GetMapping("/otp")
     public String showOtpPage(HttpSession session, Model model) {
-    	System.out.println("This is login re");
         AppUser user = (AppUser) session.getAttribute("user");
-        System.out.println(user);
         if (user == null) return "redirect:/login";
 
         model.addAttribute("qrUrl", twoFAService.getQRBarcodeURL(user.getEmail(), user.getSecret()));
