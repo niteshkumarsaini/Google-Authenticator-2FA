@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>OTP Verification</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #74ebd5, #9face6);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .otp-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        input[type="number"] {
+            padding: 0.8rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .qr-section {
+            margin-top: 1.5rem;
+        }
+
+        img {
+            max-width: 200px;
+            margin-top: 0.5rem;
+        }
+
+        .error {
+            color: red;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .otp-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="otp-container">
+    <h2>OTP Verification</h2>
+    <form th:action="@{/otp}" method="post">
+        <input type="number" name="code" placeholder="Enter 6-digit OTP" required />
+        <button type="submit">Verify OTP</button>
+    </form>
+
+    <div class="qr-section" th:if="${qrUrl}">
+        <p>Scan this QR in Google Authenticator:</p>
+        <img th:src="@{${qrUrl}}" alt="QR Code" />
+    </div>
+
+    <div class="error" th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
+</div>
+
+</body>
+</html>

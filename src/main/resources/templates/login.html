@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            margin: 0;
+            padding: 0;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 80px auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.2rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357ab8;
+        }
+
+        .error-message {
+            margin-top: 1rem;
+            color: #e74c3c;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .register-link {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .register-link a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+            .login-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Login</h2>
+        <form th:action="@{/login}" method="post">
+            <div>
+                <label for="email">Username:</label>
+                <input type="email" id="username" name="username" placeholder="Enter your email" required />
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required />
+            </div>
+            <button type="submit">Login</button>
+        </form>
+
+		<div class="error-message" th:if="${param.error}">
+		    <span th:switch="${param.error}">
+		        <span th:case="'auth'">Authentication failed. Please try again.</span>
+		        <span th:case="'userNotFound'">User not found. Please register first.</span>
+		        <span th:case="*">Invalid login attempt. Please check your credentials.</span>
+		    </span>
+		</div>
+
+        <div class="error-message" th:if="${param.logout}">
+            You have been logged out successfully.
+        </div>
+        <div class="error-message" th:if="${error}" th:text="${error}"></div>
+
+        <!-- Register Link -->
+        <div class="register-link">
+            Don't have an account? <a th:href="@{/register}">Register</a>
+        </div>
+    </div>
+
+</body>
+</html>
