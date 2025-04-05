@@ -1,4 +1,5 @@
 package com.KuberPayment.Controllers;
+
 import com.KuberPayment.Entities.AppUser;
 import com.KuberPayment.Repositories.UserRepository;
 import com.KuberPayment.Services.TwoFactorService;
@@ -40,6 +41,7 @@ public class AuthController {
     @PostMapping("/register")
     public String doRegister(@ModelAttribute("user") AppUser user,
                              @RequestParam String confirmPassword,
+                             HttpSession session,
                              Model model) {
 
         if (!user.getPassword().equals(confirmPassword)) {
@@ -58,9 +60,9 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);
 
-        String qrUrl = twoFAService.getQRBarcodeURL(user.getEmail(), user.getSecret());
-        model.addAttribute("qrUrl", qrUrl);
-        return "otp";
+        session.setAttribute("user", user);
+        session.setAttribute("registering", true); // Flag for registration
+        return "redirect:/otp";
     }
 
     // --------------------- LOGIN ------------------------
@@ -70,9 +72,6 @@ public class AuthController {
         return "login";
     }
 
-    /**
-     * After Spring Security authenticates the user, redirect here for 2FA
-     */
     @GetMapping("/handle-2fa")
     public String handleLoginWith2FA(HttpSession session) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,6 +91,7 @@ public class AuthController {
 
         if (user.is2FAEnabled()) {
             session.setAttribute("user", user);
+            // Don't set "registering" flag here
             return "redirect:/otp";
         }
 
@@ -106,7 +106,12 @@ public class AuthController {
         AppUser user = (AppUser) session.getAttribute("user");
         if (user == null) return "redirect:/login";
 
-        model.addAttribute("qrUrl", twoFAService.getQRBarcodeURL(user.getEmail(), user.getSecret()));
+        Boolean isFromRegister = (Boolean) session.getAttribute("registering");
+
+        if (Boolean.TRUE.equals(isFromRegister)) {
+            model.addAttribute("qrUrl", twoFAService.getQRBarcodeURL(user.getEmail(), user.getSecret()));
+        }
+
         return "otp";
     }
 
@@ -118,12 +123,18 @@ public class AuthController {
         boolean isValid = twoFAService.verifyOTP(user.getSecret(), code);
         if (isValid) {
             session.removeAttribute("user");
+            session.removeAttribute("registering");
             session.setAttribute("loggedInUser", user);
             return "redirect:/home";
         }
 
         model.addAttribute("error", "Invalid OTP. Please try again.");
-        model.addAttribute("qrUrl", twoFAService.getQRBarcodeURL(user.getEmail(), user.getSecret()));
+
+        Boolean isFromRegister = (Boolean) session.getAttribute("registering");
+        if (Boolean.TRUE.equals(isFromRegister)) {
+            model.addAttribute("qrUrl", twoFAService.getQRBarcodeURL(user.getEmail(), user.getSecret()));
+        }
+
         return "otp";
     }
 

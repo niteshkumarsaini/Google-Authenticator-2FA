@@ -89,11 +89,13 @@
         <button type="submit">Verify OTP</button>
     </form>
 
+    <!-- Show QR code only if qrUrl is available (i.e., during registration) -->
     <div class="qr-section" th:if="${qrUrl}">
         <p>Scan this QR in Google Authenticator:</p>
-        <img th:src="@{${qrUrl}}" alt="QR Code" />
+        <img th:src="${qrUrl}" alt="QR Code" />
     </div>
 
+    <!-- Error message -->
     <div class="error" th:if="${error}">
         <p th:text="${error}"></p>
     </div>
